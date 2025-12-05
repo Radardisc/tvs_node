@@ -1,0 +1,32 @@
+{
+  "server": {
+    "cluster_message_port": 8080,
+    "app_port": 8081,
+    "admin_port": 8082
+  },
+  "node_name": "tvs_node_2",
+  "node_uuid": "22222222-2222-2222-2222-222222222222",
+  "log_level": "info,tower_http=debug,tfs_http=debug,tvs=debug",
+  "log_dir": "/logs",
+  "middleware_factory_config": {
+    "middlewares": [
+      {
+        "name": "no_auth",
+        "middleware_type": "empty",
+        "config": {}
+      }
+    ],
+    "endpoint_mappings": [],
+    "default_middleware": "no_auth"
+  },
+  "static_config": {
+    "static_root": "/app",
+    "public_path": "static/public",
+    "private_path": "static/private"
+  },
+  "tvs": {
+    "enabled": true,
+    "vote_port": 8090,
+    "vote_host": "0.0.0.0"
+  }
+}

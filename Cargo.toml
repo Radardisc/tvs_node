@@ -1,0 +1,36 @@
+[package]
+name = "tvs_node"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "tvs_node"
+path = "src/main.rs"
+
+[features]
+default = ["ephemeral"]
+ephemeral = []
+postgres = ["dep:tvs_postgres", "dep:tfs_postgres"]
+admin-frontend = []
+
+[dependencies]
+tfs = { path = "../tfs" }
+tvs = { path = "../tvs" }
+tfs_http = { path = "../tfs_http" }
+
+# Optional persistence plugin dependencies
+tvs_postgres = { path = "../persistence_plugins/tvs_postgres", optional = true }
+tfs_postgres = { path = "../persistence_plugins/tfs_postgres", optional = true }
+
+# Core dependencies
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+tokio = { version = "1.0", features = ["full"] }
+clap = { version = "4.5.32", features = ["derive"] }
+axum = { version = "0.8.1", features = ["macros"] }
+
+[dev-dependencies]
+reqwest = { version = "0.12.12", default-features = false, features = ["rustls-tls", "json"] }
+http = "1.0"
+tfs_node_cluster = { path = "../tfs_node_cluster" }

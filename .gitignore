@@ -1,0 +1,21 @@
+# Rust build artifacts
+target/
+**/target/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# IDE folders
+.vscode/
+.claude/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Rust specific
+Cargo.lock
+**/*.rs.bk

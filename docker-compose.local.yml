@@ -1,0 +1,124 @@
+version: '3.8'
+
+# Example docker-compose configuration for running multiple TVS nodes
+# with locally-built binaries using environment variable port configuration
+#
+# Usage:
+#   1. Build binary: cargo build --release --no-default-features --features ephemeral
+#   2. Build images: docker-compose -f docker-compose.local.yml build
+#   3. Start nodes:  docker-compose -f docker-compose.local.yml up -d
+#   4. View logs:    docker-compose -f docker-compose.local.yml logs -f
+
+services:
+  # TVS Node 1 - Using default 8xxx ports
+  tvs_node_1:
+    build:
+      context: ..
+      dockerfile: tvs_node/Dockerfile.local
+    container_name: tvs_node_1
+    hostname: tvs_node_1
+    ports:
+      - "8080:8080"   # Cluster messaging
+      - "8081:8081"   # HTTP API
+      - "8090:8090"   # Vote service
+    environment:
+      # Logging
+      LOG_JSON: "false"
+      LOG_DISABLE_FILE: "true"
+      LOG_LEVEL: "info,tower_http=debug,tvs=debug"
+
+      # Node identification
+      NODE_NAME: "tvs_node_1"
+
+      # Ports (using defaults from config.json: 8080, 8081, 8082, 8090)
+      # No need to set - will use config.json values
+    volumes:
+      - ./tvs_node/configs/node1.json:/app/config.json:ro
+      - tvs_node_1_data:/data
+    networks:
+      - tvs_local_network
+
+  # TVS Node 2 - Using 10xxx ports via environment variables
+  tvs_node_2:
+    build:
+      context: ..
+      dockerfile: tvs_node/Dockerfile.local
+    container_name: tvs_node_2
+    hostname: tvs_node_2
+    ports:
+      - "10080:10080"  # Cluster messaging
+      - "10081:10081"  # HTTP API
+      - "10090:10090"  # Vote service
+    environment:
+      # Logging
+      LOG_JSON: "false"
+      LOG_DISABLE_FILE: "true"
+      LOG_LEVEL: "info,tower_http=debug,tvs=debug"
+
+      # Node identification
+      NODE_NAME: "tvs_node_2"
+
+      # Port overrides (override config.json values)
+      CLUSTER_MESSAGE_PORT: "10080"
+      APP_PORT: "10081"
+      ADMIN_PORT: "10082"
+      TVS_VOTE_PORT: "10090"
+      TVS_VOTE_HOST: "0.0.0.0"
+    volumes:
+      - ./tvs_node/configs/node2.json:/app/config.json:ro
+      - tvs_node_2_data:/data
+    networks:
+      - tvs_local_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # TVS Node 3 - Using 20xxx ports via environment variables
+  tvs_node_3:
+    build:
+      context: ..
+      dockerfile: tvs_node/Dockerfile.local
+    container_name: tvs_node_3
+    hostname: tvs_node_3
+    ports:
+      - "20080:20080"  # Cluster messaging
+      - "20081:20081"  # HTTP API
+      - "20090:20090"  # Vote service
+    environment:
+      # Logging
+      LOG_JSON: "false"
+      LOG_DISABLE_FILE: "true"
+      LOG_LEVEL: "info,tower_http=debug,tvs=debug"
+
+      # Node identification
+      NODE_NAME: "tvs_node_3"
+
+      # Port overrides
+      CLUSTER_MESSAGE_PORT: "20080"
+      APP_PORT: "20081"
+      ADMIN_PORT: "20082"
+      TVS_VOTE_PORT: "20090"
+      TVS_VOTE_HOST: "0.0.0.0"
+    volumes:
+      - ./tvs_node/configs/node3.json:/app/config.json:ro
+      - tvs_node_3_data:/data
+    networks:
+      - tvs_local_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:20090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  tvs_local_network:
+    driver: bridge
+
+volumes:
+  tvs_node_1_data:
+  tvs_node_2_data:
+  tvs_node_3_data:

@@ -1,0 +1,28 @@
+# Runtime-only Dockerfile for pre-built TVS Node binary
+# Build the binary locally first with: cargo build --release --no-default-features --features ephemeral
+# Uses tvs_rust_base with rustls (pure Rust TLS) - no OpenSSL dependency
+
+FROM tvs_rust_base:latest
+
+# Copy pre-built binary from local build
+# Build context should be the workspace root (/home/ror/lab/tfs)
+# Binary will be at target/release/tvs_node relative to context
+COPY --chown=appuser:appuser target/release/tvs_node /app/tvs_node
+
+# Service-specific environment variables
+ENV LOG_LEVEL="info,tower_http=debug,tvs=debug"
+
+# Expose ports
+# 8080 - TFS cluster messaging
+# 8081 - HTTP API
+# 8082 - Admin interface
+# 8090 - Vote service
+# 10080-10090 - Extended port range for multi-node setups
+EXPOSE 8080-8090 10080-10090
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:${TVS_VOTE_PORT:-8090}/health || exit 1
+
+# Default command
+CMD ["/app/tvs_node", "--config", "/app/config.json"]
