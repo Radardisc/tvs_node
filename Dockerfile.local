@@ -2,7 +2,7 @@
 # Build the binary locally first with: cargo build --release --no-default-features --features ephemeral
 # Uses tvs_rust_base with rustls (pure Rust TLS) - no OpenSSL dependency
 
-FROM tvs_rust_base:latest
+FROM tfs_rust_base:latest
 
 # Copy pre-built binary from local build
 # Build context should be the workspace root (/home/ror/lab/tfs)

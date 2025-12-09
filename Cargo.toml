@@ -34,3 +34,7 @@ axum = { version = "0.8.1", features = ["macros"] }
 reqwest = { version = "0.12.12", default-features = false, features = ["rustls-tls", "json"] }
 http = "1.0"
 tfs_node_cluster = { path = "../tfs_node_cluster" }
+tvs_cluster = { path = "../tvs_cluster" }
+serial_test = "3.0"
+serde_yaml = "0.9"
+chrono = "0.4"
